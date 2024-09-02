@@ -175,7 +175,7 @@ resource "docker_container" "workspace" {
   }
   mounts {
     target    = "/home/${local.username}/Repositories"
-    source    = "~/Repositories"
+    source    = pathexpand("~/Repositories")
     type      = "bind"
     read_only = false
   }
