@@ -202,7 +202,7 @@ resource "docker_container" "workspace" {
   }
   volumes {
     container_path = "/home/${local.username}/Repositories"
-    host_path      = pathexpand("~/Repositories")
+    host_path      = "/Users/jobc/Repositories"
     volume_name    = docker_volume.repositories_volume.name
     read_only      = false
   }
