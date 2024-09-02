@@ -8,10 +8,19 @@ RUN apt-get update \
 		keychain \
 		mycli \
 		neovim \
-		php \
 		sudo \
+		unzip \
 		wget \
+		zip \
 		zsh \
+        make \
+		&& rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update \
+	&& apt-get install -y \
+		php-cli \
+		php-curl \
+		php-xml \
 		&& rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer/composer:latest-bin /composer /usr/bin/composer
@@ -30,7 +39,8 @@ RUN install -m 0755 -d /etc/apt/keyrings \
 		docker-buildx-plugin \
 		docker-ce \
 		docker-ce-cli \ 
-		docker-compose-plugin
+		docker-compose-plugin \
+		&& rm -rf /var/lib/apt/lists/*
 
 ARG USER=coder
 RUN useradd --groups sudo --no-create-home --shell /bin/bash ${USER} \
