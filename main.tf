@@ -41,24 +41,7 @@ resource "coder_agent" "main" {
 
     # Start code-server in the background.
     /tmp/code-server/bin/code-server --auth none --port 13337 >/tmp/code-server.log 2>&1 &
-
-    # Set up dotfiles.
-    if [ ! -d ~/Repositories/jobcabral/dotfiles ]; then
-      git clone https://github.com/bojboj/dotfiles ~/Repositories/jobcabral/dotfiles
-      cd Repositories/jobcabral/dotfiles && ./install.sh
-    fi
   EOT
-
-  # These environment variables allow you to make Git commits right away after creating a
-  # workspace. Note that they take precedence over configuration defined in ~/.gitconfig!
-  # You can remove this block if you'd prefer to configure Git manually or using
-  # dotfiles. (see docs/dotfiles.md)
-  env = {
-    GIT_AUTHOR_NAME     = coalesce(data.coder_workspace_owner.me.full_name, data.coder_workspace_owner.me.name)
-    GIT_AUTHOR_EMAIL    = "${data.coder_workspace_owner.me.email}"
-    GIT_COMMITTER_NAME  = coalesce(data.coder_workspace_owner.me.full_name, data.coder_workspace_owner.me.name)
-    GIT_COMMITTER_EMAIL = "${data.coder_workspace_owner.me.email}"
-  }
 
   # The following metadata blocks are optional. They are used to display
   # information about your workspace in the dashboard. You can remove them
@@ -143,8 +126,8 @@ resource "coder_app" "code-server" {
   }
 }
 
-resource "docker_volume" "home_volume" {
-  name = "coder-shared-home"
+resource "docker_volume" "repositories_volume" {
+  name = "coder-shared-repositories"
   # Protect the volume from being deleted due to changes in attributes.
   lifecycle {
     ignore_changes = all
@@ -218,8 +201,9 @@ resource "docker_container" "workspace" {
     ip   = "host-gateway"
   }
   volumes {
-    container_path = "/home/${local.username}"
-    volume_name    = docker_volume.home_volume.name
+    container_path = "/home/${local.username}/Repositories"
+    host_path      = pathexpand("~/Repositories")
+    volume_name    = docker_volume.repositories_volume.name
     read_only      = false
   }
 
